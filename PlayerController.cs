@@ -14,6 +14,8 @@ public class PlayerController : MonoBehaviour
 
     public float movespeed = 5f;
     public float mousesensitivity;
+    public float minangleofrotation;
+    public float maxangleofrotation;
     public Camera viewcam;
 
 
@@ -55,11 +57,31 @@ public class PlayerController : MonoBehaviour
         // PLAYER CAMERA CONTROL
         mouseinput = new Vector3(Input.GetAxisRaw("Mouse Y"),-1*Input.GetAxisRaw("Mouse X"),0f) * mousesensitivity;
 
-        viewcam.transform.rotation = Quaternion.Euler(viewcam.transform.rotation.eulerAngles.x-mouseinput.x,viewcam.transform.rotation.eulerAngles.y,viewcam.transform.rotation.eulerAngles.z);
+        float rotX = viewcam.transform.rotation.eulerAngles.x-mouseinput.x;
+
+        viewcam.transform.rotation = Quaternion.Euler(Clampangle(rotX,minangleofrotation,maxangleofrotation),viewcam.transform.rotation.eulerAngles.y,viewcam.transform.rotation.eulerAngles.z);
         
         transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x,transform.rotation.eulerAngles.y-mouseinput.y,transform.rotation.eulerAngles.z);
 
     }
+    
+    
+    // ------------------ for clamping ------------------------------
+
+    float Clampangle(float angle,float min,float max)
+    {
+        if (angle<90 || angle>-90){       // if angle in the critic region...
+            if (angle>180) angle -= 360;  // convert all angles to -180..+180
+            if (max>180) max -= 360;
+            if (min>180) min -= 360;
+        }    
+        angle = Mathf.Clamp(angle, min, max);
+        if (angle<0) angle += 360;  // if angle negative, convert to 0..360
+        return angle;
+    }
+
+    // ------------------ for clamping ------------------------------
+
     
 
 }
